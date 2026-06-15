@@ -24,6 +24,8 @@ function initApp() {
 
   if (settings.sbUrl && settings.sbKey) {
     initSupabase(settings.sbUrl, settings.sbKey);
+    syncFromSupabase();
+    setInterval(syncFromSupabase, 60000); // auto-pull every 60s
   }
 }
 
@@ -84,15 +86,22 @@ function saveSupabaseSettings() {
   localStorage.setItem('fitlog_settings', JSON.stringify(settings));
   if (settings.sbUrl && settings.sbKey) {
     initSupabase(settings.sbUrl, settings.sbKey);
-    showToast('Supabase connected ✓');
+    syncFromSupabase();
+    if (syncInterval) clearInterval(syncInterval);
+    syncInterval = setInterval(syncFromSupabase, 60000);
+    showToast('Supabase connected ✓ — syncing...');
   }
 }
 function openSettings() { showSection('settings'); }
 
 // ===================== SUPABASE =====================
+let syncInterval = null;
 function initSupabase(url, key) {
   try {
     sbClient = window.supabase.createClient(url, key);
+    const btn = document.getElementById('syncBtn');
+    if (btn) btn.style.display = 'inline-flex';
+    setSyncStatus('idle');
   } catch (e) { console.warn('Supabase init failed', e); }
 }
 function skipSupabase() {
@@ -124,13 +133,64 @@ function saveReview(r) {
   reviews.unshift(r);
   localStorage.setItem('fitlog_reviews', JSON.stringify(reviews.slice(0, 50)));
 }
+function setSyncStatus(state) {
+  // state: 'syncing' | 'ok' | 'error' | 'idle'
+  const icons = { syncing:'🔄', ok:'☁️', error:'⚠️', idle:'☁️' };
+  const colors = { syncing:'#38BDF8', ok:'#00D68F', error:'#FF6584', idle:'var(--text-secondary)' };
+  const el = document.getElementById('syncBtn');
+  if (!el) return;
+  el.textContent = icons[state] || '☁️';
+  el.style.color = colors[state] || 'var(--text-secondary)';
+  if (state === 'ok') {
+    const t = new Date().toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+    el.title = 'Last synced: ' + t;
+  }
+}
+
 async function syncToSupabase(logs) {
   if (!sbClient) return;
+  setSyncStatus('syncing');
   try {
     for (const [date, log] of Object.entries(logs)) {
       await sbClient.from('fitlog_entries').upsert({ date, data: log }, { onConflict: 'date' });
     }
-  } catch (e) { console.warn('Supabase sync error', e); }
+    setSyncStatus('ok');
+  } catch (e) {
+    console.warn('Supabase sync error', e);
+    setSyncStatus('error');
+  }
+}
+
+async function syncFromSupabase() {
+  if (!sbClient) return;
+  setSyncStatus('syncing');
+  try {
+    const { data, error } = await sbClient.from('fitlog_entries').select('date, data');
+    if (error) throw error;
+    if (!data || data.length === 0) { setSyncStatus('ok'); return; }
+    const local = getLogs();
+    let changed = false;
+    for (const row of data) {
+      const remote = row.data;
+      const existing = local[row.date];
+      // Remote wins if: no local entry, or remote is 'final' and local is 'draft', or remote is newer
+      if (!existing ||
+          (remote.status === 'final' && existing.status === 'draft') ||
+          (remote.savedAt && existing.savedAt && remote.savedAt > existing.savedAt)) {
+        local[row.date] = remote;
+        changed = true;
+      }
+    }
+    if (changed) {
+      localStorage.setItem('fitlog_logs', JSON.stringify(local));
+      renderDashboard();
+      loadLogIntoForm(currentLogDate);
+    }
+    setSyncStatus('ok');
+  } catch (e) {
+    console.warn('Supabase pull error', e);
+    setSyncStatus('error');
+  }
 }
 
 // ===================== NAVIGATION =====================
