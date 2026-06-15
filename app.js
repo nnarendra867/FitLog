@@ -56,7 +56,7 @@ function fmtDuration(d) {
 
 // ===================== SETTINGS =====================
 function loadSettings() {
-  const def = { proteinTarget: 130, stepsTarget: 8000, waterTarget: 3.5, ollamaUrl: 'http://localhost:11434', ollamaModel: 'gemma3:4b', sbUrl: '', sbKey: '', geminiKey: '' };
+  const def = { proteinTarget: 130, stepsTarget: 8000, waterTarget: 3.5, ollamaUrl: 'http://localhost:11434', ollamaModel: 'gemma4:26b', sbUrl: '', sbKey: '', geminiKey: '' };
   try { return { ...def, ...JSON.parse(localStorage.getItem('fitlog_settings') || '{}') }; } catch { return def; }
 }
 function saveSettings() {
