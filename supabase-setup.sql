@@ -1,37 +1,32 @@
--- Run this in Supabase SQL Editor after creating your project
+-- Run this in Supabase SQL Editor (Dashboard → SQL Editor → New Query)
 
 -- Daily log entries table
 CREATE TABLE IF NOT EXISTS fitlog_entries (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  date DATE NOT NULL,
+  date DATE PRIMARY KEY,
   data JSONB NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE(user_id, date)
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- AI reviews table
 CREATE TABLE IF NOT EXISTS fitlog_reviews (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   review_date DATE NOT NULL,
   range_type TEXT,
   review_text TEXT NOT NULL,
   generated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Row Level Security (each user sees only their own data)
+-- Allow anon key full access (personal single-user app)
 ALTER TABLE fitlog_entries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE fitlog_reviews ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users own their entries" ON fitlog_entries
-  FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY "anon full access entries" ON fitlog_entries
+  FOR ALL TO anon USING (true) WITH CHECK (true);
 
-CREATE POLICY "Users own their reviews" ON fitlog_reviews
-  FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY "anon full access reviews" ON fitlog_reviews
+  FOR ALL TO anon USING (true) WITH CHECK (true);
 
--- Updated at trigger
+-- Auto-update timestamp
 CREATE OR REPLACE FUNCTION update_updated_at()
 RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = NOW(); RETURN NEW; END; $$ LANGUAGE plpgsql;
 
