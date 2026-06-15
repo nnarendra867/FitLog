@@ -1,0 +1,15 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Claude Code
+.claude/
+
+# PRD / planning files
+prd.js
+FitLog_AI_PRD.docx
+
+# Editor
+.vscode/
+.idea/
