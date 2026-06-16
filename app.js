@@ -491,6 +491,118 @@ const EXERCISE_DESC = {
   'Camel Pose':            'Kneel, reach back to heels, open chest to ceiling. Backbend.',
 };
 
+// ===================== EXERCISE DETAIL MODAL =====================
+const exerciseImageCache = new Map();
+let activeDetailExercise = null;
+
+async function fetchExerciseData(name) {
+  if (exerciseImageCache.has(name)) return exerciseImageCache.get(name);
+  try {
+    const res = await fetch(
+      `https://wger.de/api/v2/exercise/search/?term=${encodeURIComponent(name)}&language=english&format=json`,
+      { signal: AbortSignal.timeout(6000) }
+    );
+    const data = await res.json();
+    const match = (data.suggestions || []).find(s =>
+      s.value.toLowerCase().includes(name.toLowerCase().split(' ')[0])
+    ) || data.suggestions?.[0];
+    if (!match) { exerciseImageCache.set(name, null); return null; }
+
+    const exId = match.data.id;
+    const [imgRes, detailRes] = await Promise.all([
+      fetch(`https://wger.de/api/v2/exerciseimage/?format=json&exercise=${exId}&is_main=true`, { signal: AbortSignal.timeout(6000) }),
+      fetch(`https://wger.de/api/v2/exerciseinfo/${exId}/?format=json`, { signal: AbortSignal.timeout(6000) })
+    ]);
+    const imgData = await imgRes.json();
+    const detail = await detailRes.json();
+    const muscles = [
+      ...(detail.muscles || []).map(m => m.name_en),
+      ...(detail.muscles_secondary || []).map(m => m.name_en)
+    ].filter(Boolean).slice(0, 4);
+    const result = {
+      imageUrl: imgData.results?.[0]?.image || null,
+      muscles
+    };
+    exerciseImageCache.set(name, result);
+    return result;
+  } catch {
+    exerciseImageCache.set(name, null);
+    return null;
+  }
+}
+
+function showExDetail(name, group) {
+  activeDetailExercise = name;
+  const icon = EXERCISE_ICONS[name] || '🏃';
+  const gs = GROUP_STYLES[group] || GROUP_STYLES['Arms'];
+  const desc = EXERCISE_DESC[name] || '';
+  const isSelected = selectedExercises.has(name);
+
+  document.getElementById('edIcon').textContent = icon;
+  document.getElementById('edName').textContent = name;
+  document.getElementById('edGroup').textContent = group;
+  document.getElementById('edGroup').style.color = gs.color;
+  document.getElementById('edDesc').textContent = desc;
+  document.getElementById('edMuscles').style.display = 'none';
+  document.getElementById('edSelectBtn').textContent = isSelected ? '✓ Added — Remove' : '+ Add to Workout';
+  document.getElementById('edSelectBtn').style.background = isSelected
+    ? 'linear-gradient(135deg,#FF6584,#FF9F43)' : '';
+
+  // Reset image area
+  document.getElementById('edSpinner').style.display = 'block';
+  document.getElementById('edImage').style.display = 'none';
+  document.getElementById('edImgPlaceholder').style.display = 'none';
+
+  document.getElementById('exDetailModal').style.display = 'flex';
+
+  fetchExerciseData(name).then(result => {
+    document.getElementById('edSpinner').style.display = 'none';
+    if (result?.imageUrl) {
+      const img = document.getElementById('edImage');
+      img.src = result.imageUrl;
+      img.style.display = 'block';
+      if (result.muscles?.length) {
+        document.getElementById('edMuscleList').textContent = result.muscles.join(', ');
+        document.getElementById('edMuscles').style.display = 'block';
+      }
+    } else {
+      const ph = document.getElementById('edImgPlaceholder');
+      ph.textContent = icon;
+      ph.style.display = 'block';
+    }
+  });
+}
+
+function closeExDetail() {
+  document.getElementById('exDetailModal').style.display = 'none';
+  activeDetailExercise = null;
+}
+
+function toggleExFromDetail() {
+  const name = activeDetailExercise;
+  if (!name) return;
+  const tag = document.querySelector(`.exercise-tag[data-name="${CSS.escape(name)}"]`);
+  if (selectedExercises.has(name)) {
+    selectedExercises.delete(name);
+    if (tag) {
+      tag.classList.remove('selected');
+      const gs = GROUP_STYLES[tag.dataset.group] || GROUP_STYLES['Arms'];
+      tag.style.background = gs.bg; tag.style.borderColor = gs.border; tag.style.color = '';
+    }
+    document.getElementById('edSelectBtn').textContent = '+ Add to Workout';
+    document.getElementById('edSelectBtn').style.background = '';
+  } else {
+    selectedExercises.add(name);
+    if (tag) {
+      tag.classList.add('selected');
+      const gs = GROUP_STYLES[tag.dataset.group] || GROUP_STYLES['Arms'];
+      tag.style.background = gs.selBg; tag.style.borderColor = gs.color; tag.style.color = 'white';
+    }
+    document.getElementById('edSelectBtn').textContent = '✓ Added — Remove';
+    document.getElementById('edSelectBtn').style.background = 'linear-gradient(135deg,#FF6584,#FF9F43)';
+  }
+}
+
 let tooltipTimer = null;
 function showExTooltip(icon, name, desc) {
   clearTimeout(tooltipTimer);
@@ -523,8 +635,13 @@ function initExerciseTags() {
       tag.style.cssText = `background:${gs.bg};border-color:${gs.border};`;
       tag.dataset.name = ex;
       tag.dataset.group = group;
-      tag.innerHTML = `<span class="ex-icon">${icon}</span><span>${ex}</span>`;
-      tag.title = desc; // desktop hover
+      tag.innerHTML = `<span class="ex-icon">${icon}</span><span>${ex}</span><span class="ex-info" title="View exercise">ℹ️</span>`;
+      tag.title = desc;
+      // Info button → open detail modal
+      tag.querySelector('.ex-info').addEventListener('click', e => {
+        e.stopPropagation();
+        showExDetail(ex, group);
+      });
       tag.onclick = () => {
         if (selectedExercises.has(ex)) {
           selectedExercises.delete(ex);
