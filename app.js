@@ -55,7 +55,7 @@ function fmtDuration(d) {
 
 // ===================== SETTINGS =====================
 function loadSettings() {
-  const def = { proteinTarget: 130, stepsTarget: 8000, waterTarget: 3.5, ollamaUrl: 'http://localhost:11434', ollamaModel: 'gemma4:26b', sbUrl: '', sbKey: '', geminiKey: '' };
+  const def = { proteinTarget: 130, stepsTarget: 8000, waterTarget: 3.5, ollamaUrl: 'http://localhost:11434', ollamaModel: 'gemma4:26b', sbUrl: '', sbKey: '', geminiKey: '', exerciseDbKey: '' };
   try {
     const saved = { ...def, ...JSON.parse(localStorage.getItem('fitlog_settings') || '{}') };
     // migrate old default model
@@ -70,6 +70,8 @@ function saveSettings() {
   settings.ollamaUrl = document.getElementById('s-ollama-url').value.trim();
   settings.ollamaModel = document.getElementById('s-ollama-model').value.trim();
   settings.geminiKey = document.getElementById('s-gemini-key').value.trim();
+  settings.exerciseDbKey = document.getElementById('s-exdb-key').value.trim();
+  exerciseImageCache.clear(); // refresh cache when key changes
   localStorage.setItem('fitlog_settings', JSON.stringify(settings));
   showToast('Settings saved ✓');
   checkOllama();
@@ -83,6 +85,7 @@ function applySettings() {
   document.getElementById('s-sb-url').value = settings.sbUrl;
   document.getElementById('s-sb-key').value = settings.sbKey;
   document.getElementById('s-gemini-key').value = settings.geminiKey || '';
+  document.getElementById('s-exdb-key').value = settings.exerciseDbKey || '';
 }
 function saveSupabaseSettings() {
   settings.sbUrl = document.getElementById('s-sb-url').value.trim();
@@ -644,6 +647,37 @@ let activeDetailExercise = null;
 
 async function fetchExerciseData(name) {
   if (exerciseImageCache.has(name)) return exerciseImageCache.get(name);
+
+  // ExerciseDB API (RapidAPI) — GIFs for all exercises when key is set
+  if (settings.exerciseDbKey) {
+    try {
+      const term = encodeURIComponent(name.toLowerCase().replace(/['']/g, "'"));
+      const res = await fetch(
+        `https://exercisedb.p.rapidapi.com/exercises/name/${term}?limit=1&offset=0`,
+        {
+          headers: {
+            'X-RapidAPI-Key': settings.exerciseDbKey,
+            'X-RapidAPI-Host': 'exercisedb.p.rapidapi.com'
+          },
+          signal: AbortSignal.timeout(8000)
+        }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.length) {
+          const ex = data[0];
+          const result = {
+            imageUrl: ex.gifUrl || null,
+            muscles: [ex.target, ex.bodyPart].filter(Boolean)
+          };
+          exerciseImageCache.set(name, result);
+          return result;
+        }
+      }
+    } catch { /* fall through to hardcoded map */ }
+  }
+
+  // Fallback: hardcoded wger.de images + muscle data
   const data = EXERCISE_IMG_DATA[name];
   if (data) {
     const result = { imageUrl: data.img, muscles: data.muscles };
@@ -671,8 +705,9 @@ function showExDetail(name, group) {
   document.getElementById('edSelectBtn').style.background = isSelected
     ? 'linear-gradient(135deg,#FF6584,#FF9F43)' : '';
 
-  // Reset image area
-  document.getElementById('edSpinner').style.display = 'none';
+  // Reset image area — show spinner only when network fetch needed
+  const needsFetch = settings.exerciseDbKey && !exerciseImageCache.has(name);
+  document.getElementById('edSpinner').style.display = needsFetch ? 'block' : 'none';
   document.getElementById('edImage').style.display = 'none';
   document.getElementById('edImgPlaceholder').style.display = 'none';
 
