@@ -494,43 +494,167 @@ const EXERCISE_DESC = {
 };
 
 // ===================== EXERCISE DETAIL MODAL =====================
+const W = 'https://wger.de/media/exercise-images/';
+const EXERCISE_IMG_DATA = {
+  // Arms
+  'Bicep Curls':       { img: W+'74/Bicep-curls-1.png',            muscles: ['Biceps'] },
+  'Tricep Dips':       { img: W+'83/Bench-dips-1.png',             muscles: ['Triceps','Chest'] },
+  'Hammer Curls':      { img: W+'86/Bicep-hammer-curl-1.png',      muscles: ['Biceps','Brachialis'] },
+  'Tricep Pushdown':   { img: null,                                 muscles: ['Triceps'] },
+  'Overhead Extension':{ img: null,                                 muscles: ['Triceps'] },
+  'Wrist Curls':       { img: W+'51/f1730f56-7aca-4566-8338-3e42b1bee6e1.webp', muscles: ['Forearms'] },
+  'Concentration Curls':{ img: null,                                muscles: ['Biceps'] },
+  'Preacher Curls':    { img: W+'193/Preacher-curl-3-1.png',       muscles: ['Biceps'] },
+  'Cable Curls':       { img: null,                                 muscles: ['Biceps'] },
+  'Reverse Curls':     { img: null,                                 muscles: ['Biceps','Brachialis'] },
+  'Skull Crushers':    { img: W+'84/Lying-close-grip-triceps-press-to-chin-1.png', muscles: ['Triceps'] },
+  'Close-Grip Bench':  { img: W+'61/Close-grip-bench-press-1.png', muscles: ['Triceps','Chest'] },
+  'Tricep Kickbacks':  { img: null,                                 muscles: ['Triceps'] },
+  '21s':               { img: W+'74/Bicep-curls-1.png',            muscles: ['Biceps'] },
+  // Chest
+  'Push-ups':          { img: null,                                 muscles: ['Chest','Triceps','Shoulders'] },
+  'Bench Press':       { img: W+'192/Bench-press-1.png',           muscles: ['Chest','Triceps','Shoulders'] },
+  'Incline Press':     { img: W+'16/Incline-press-1.png',          muscles: ['Upper Chest','Triceps'] },
+  'Chest Flyes':       { img: W+'122/Incline-cable-flyes-1.png',   muscles: ['Chest'] },
+  'Dips':              { img: W+'194/34600351-8b0b-4cb0-8daa-583537be15b0.png', muscles: ['Chest','Triceps'] },
+  'Cable Crossover':   { img: W+'71/Cable-crossover-2.png',        muscles: ['Chest'] },
+  'Decline Press':     { img: W+'100/Decline-bench-press-1.png',   muscles: ['Lower Chest','Triceps'] },
+  'Decline Flyes':     { img: W+'100/Decline-bench-press-1.png',   muscles: ['Lower Chest'] },
+  'Wide Push-ups':     { img: null,                                 muscles: ['Chest','Triceps'] },
+  'Diamond Push-ups':  { img: null,                                 muscles: ['Triceps','Chest'] },
+  'Pec Deck':          { img: W+'98/Butterfly-machine-2.png',      muscles: ['Chest'] },
+  'Landmine Press':    { img: null,                                 muscles: ['Chest','Shoulders'] },
+  // Back
+  'Pull-ups':          { img: W+'475/b0554016-16fd-4dbe-be47-a2a17d16ae0e.jpg', muscles: ['Lats','Biceps'] },
+  'Lat Pulldown':      { img: null,                                 muscles: ['Lats','Biceps'] },
+  'Seated Rows':       { img: W+'143/Cable-seated-rows-2.png',     muscles: ['Lats','Rhomboids'] },
+  'Deadlift':          { img: W+'161/Dead-lifts-2.png',            muscles: ['Hamstrings','Glutes','Lats'] },
+  'T-Bar Row':         { img: W+'106/T-bar-row-1.png',             muscles: ['Lats','Rhomboids'] },
+  'Face Pulls':        { img: null,                                 muscles: ['Rear Delts','Rotator Cuff'] },
+  'Chin-ups':          { img: W+'181/Chin-ups-2.png',              muscles: ['Lats','Biceps'] },
+  'Single Arm Row':    { img: null,                                 muscles: ['Lats','Rhomboids'] },
+  'Bent-Over Row':     { img: W+'110/Reverse-grip-bent-over-rows-1.png', muscles: ['Lats','Rhomboids','Biceps'] },
+  'Rack Pulls':        { img: W+'161/Dead-lifts-2.png',            muscles: ['Lats','Traps','Glutes'] },
+  'Good Mornings':     { img: W+'116/Good-mornings-2.png',         muscles: ['Hamstrings','Lower Back'] },
+  'Reverse Flyes':     { img: null,                                 muscles: ['Rear Delts','Rhomboids'] },
+  'Straight-Arm Pulldown': { img: null,                            muscles: ['Lats'] },
+  'Hyperextensions':   { img: W+'128/Hyperextensions-1.png',       muscles: ['Lower Back','Glutes'] },
+  // Shoulders
+  'Shoulder Press':    { img: W+'123/dumbbell-shoulder-press-large-1.png', muscles: ['Shoulders','Triceps'] },
+  'Lateral Raises':    { img: W+'148/lateral-dumbbell-raises-large-2.png', muscles: ['Shoulders'] },
+  'Front Raises':      { img: W+'256/b7def5bc-2352-499b-b9e5-fff741003831.png', muscles: ['Front Delts'] },
+  'Arnold Press':      { img: W+'123/dumbbell-shoulder-press-large-1.png', muscles: ['Shoulders','Triceps'] },
+  'Shrugs':            { img: W+'150/Barbell-shrugs-1.png',        muscles: ['Traps'] },
+  'Upright Row':       { img: null,                                 muscles: ['Traps','Shoulders'] },
+  'Reverse Pec Deck':  { img: W+'98/Butterfly-machine-2.png',      muscles: ['Rear Delts'] },
+  'Cable Lateral Raise':{ img: W+'148/lateral-dumbbell-raises-large-2.png', muscles: ['Shoulders'] },
+  'Cable Front Raise': { img: W+'256/b7def5bc-2352-499b-b9e5-fff741003831.png', muscles: ['Front Delts'] },
+  'Dumbbell Shrugs':   { img: W+'151/Dumbbell-shrugs-2.png',      muscles: ['Traps'] },
+  'Machine Press':     { img: W+'53/Shoulder-press-machine-2.png', muscles: ['Shoulders','Triceps'] },
+  'Bent-Over Lateral Raise': { img: null,                          muscles: ['Rear Delts','Rhomboids'] },
+  // Core
+  'Plank':             { img: W+'458/b7bd9c28-9f1d-4647-bd17-ab6a3adf5770.png', muscles: ['Abs','Core'] },
+  'Crunches':          { img: W+'91/Crunches-1.png',               muscles: ['Abs'] },
+  'Leg Raises':        { img: W+'125/Leg-raises-2.png',            muscles: ['Abs','Hip Flexors'] },
+  'Russian Twists':    { img: null,                                 muscles: ['Obliques','Abs'] },
+  'Bicycle Crunches':  { img: W+'176/Cross-body-crunch-1.png',     muscles: ['Abs','Obliques'] },
+  'Ab Wheel':          { img: null,                                 muscles: ['Abs','Core'] },
+  'Side Plank':        { img: null,                                 muscles: ['Obliques','Core'] },
+  'Hollow Hold':       { img: W+'297/b10d3341-baa8-49ab-b462-5b3529389aac.png', muscles: ['Abs','Core'] },
+  'V-Ups':             { img: null,                                 muscles: ['Abs','Hip Flexors'] },
+  'Toe Touches':       { img: null,                                 muscles: ['Abs','Hamstrings'] },
+  'Dead Bug':          { img: null,                                 muscles: ['Abs','Core'] },
+  'Cable Crunch':      { img: null,                                 muscles: ['Abs'] },
+  'Hanging Knee Raise':{ img: null,                                 muscles: ['Abs','Hip Flexors'] },
+  'Hanging Leg Raise': { img: null,                                 muscles: ['Abs','Hip Flexors'] },
+  'Dragon Flag':       { img: null,                                 muscles: ['Abs','Core'] },
+  'Mountain Climbers': { img: null,                                 muscles: ['Abs','Shoulders','Quads'] },
+  // Legs
+  'Squats':            { img: null,                                 muscles: ['Quads','Glutes','Hamstrings'] },
+  'Lunges':            { img: W+'113/Walking-lunges-1.png',        muscles: ['Quads','Glutes','Hamstrings'] },
+  'Leg Press':         { img: null,                                 muscles: ['Quads','Glutes'] },
+  'Leg Curls':         { img: W+'154/lying-leg-curl-machine-large-1.png', muscles: ['Hamstrings'] },
+  'Calf Raises':       { img: null,                                 muscles: ['Calves'] },
+  'Glute Bridges':     { img: null,                                 muscles: ['Glutes','Hamstrings'] },
+  'Romanian Deadlift': { img: W+'161/Dead-lifts-2.png',            muscles: ['Hamstrings','Glutes','Lower Back'] },
+  'Bulgarian Split Squat': { img: null,                            muscles: ['Quads','Glutes'] },
+  'Hack Squat':        { img: W+'130/Narrow-stance-hack-squats-1-1024x721.png', muscles: ['Quads','Glutes'] },
+  'Sumo Squat':        { img: null,                                 muscles: ['Quads','Glutes','Inner Thighs'] },
+  'Box Jumps':         { img: null,                                 muscles: ['Quads','Glutes','Calves'] },
+  'Step-Ups':          { img: null,                                 muscles: ['Quads','Glutes'] },
+  'Leg Extensions':    { img: null,                                 muscles: ['Quads'] },
+  'Hip Thrust':        { img: null,                                 muscles: ['Glutes','Hamstrings'] },
+  'Wall Sit':          { img: null,                                 muscles: ['Quads','Glutes'] },
+  'Goblet Squat':      { img: null,                                 muscles: ['Quads','Glutes','Core'] },
+  'Nordic Curls':      { img: null,                                 muscles: ['Hamstrings'] },
+  // Cardio
+  'Incline Walk':      { img: null,                                 muscles: ['Quads','Calves','Glutes'] },
+  'Running':           { img: null,                                 muscles: ['Quads','Hamstrings','Calves'] },
+  'Cycling':           { img: null,                                 muscles: ['Quads','Hamstrings','Calves'] },
+  'Jump Rope':         { img: null,                                 muscles: ['Calves','Shoulders','Core'] },
+  'HIIT':              { img: null,                                 muscles: ['Full Body','Cardio'] },
+  'Stair Climber':     { img: null,                                 muscles: ['Quads','Glutes','Calves'] },
+  'Rowing Machine':    { img: null,                                 muscles: ['Back','Legs','Arms'] },
+  'Elliptical':        { img: null,                                 muscles: ['Quads','Hamstrings','Arms'] },
+  'Swimming':          { img: null,                                 muscles: ['Full Body'] },
+  'Shadow Boxing':     { img: null,                                 muscles: ['Shoulders','Arms','Core'] },
+  'Sprint Intervals':  { img: null,                                 muscles: ['Quads','Hamstrings','Calves'] },
+  'Jumping Jacks':     { img: W+'320/6c9124b6-3551-47a8-9c22-20141c8b9c53.png', muscles: ['Legs','Shoulders'] },
+  'High Knees':        { img: null,                                 muscles: ['Quads','Core','Calves'] },
+  'Assault Bike':      { img: null,                                 muscles: ['Full Body','Cardio'] },
+  // Full Body
+  'Burpees':           { img: null,                                 muscles: ['Full Body'] },
+  'Kettlebell Swings': { img: null,                                 muscles: ['Glutes','Hamstrings','Core'] },
+  'Battle Ropes':      { img: null,                                 muscles: ['Shoulders','Arms','Core'] },
+  'Clean & Press':     { img: null,                                 muscles: ['Legs','Shoulders','Core'] },
+  'Thrusters':         { img: null,                                 muscles: ['Quads','Shoulders','Core'] },
+  'Turkish Get-Up':    { img: null,                                 muscles: ['Full Body','Core'] },
+  'Sandbag Carry':     { img: null,                                 muscles: ['Core','Traps','Legs'] },
+  "Farmer's Walk":     { img: null,                                 muscles: ['Grip','Traps','Core'] },
+  'Sled Push':         { img: null,                                 muscles: ['Quads','Glutes','Calves'] },
+  'Bear Crawl':        { img: null,                                 muscles: ['Shoulders','Core','Quads'] },
+  'Man Makers':        { img: null,                                 muscles: ['Full Body'] },
+  'Barbell Complex':   { img: null,                                 muscles: ['Full Body'] },
+  // Mobility & Yoga — muscles only
+  'Foam Rolling':      { img: null, muscles: ['Recovery','Fascia'] },
+  'Hip Flexor Stretch':{ img: null, muscles: ['Hip Flexors','Quads'] },
+  'Hamstring Stretch': { img: null, muscles: ['Hamstrings'] },
+  'Shoulder Stretch':  { img: null, muscles: ['Shoulders','Chest'] },
+  'Pigeon Pose':       { img: null, muscles: ['Hips','Glutes'] },
+  'Cat-Cow':           { img: null, muscles: ['Spine','Core'] },
+  'Thoracic Rotation': { img: null, muscles: ['Upper Back','Spine'] },
+  'Ankle Circles':     { img: null, muscles: ['Ankles','Calves'] },
+  "World's Greatest Stretch": { img: null, muscles: ['Hips','Spine','Hamstrings'] },
+  'Band Pull-Aparts':  { img: null, muscles: ['Rear Delts','Rotator Cuff'] },
+  'Doorway Chest Stretch': { img: null, muscles: ['Chest','Shoulders'] },
+  "Child's Pose":      { img: null, muscles: ['Spine','Hips','Lats'] },
+  'Sun Salutation':    { img: null, muscles: ['Full Body'] },
+  'Downward Dog':      { img: null, muscles: ['Hamstrings','Calves','Shoulders'] },
+  'Warrior I':         { img: null, muscles: ['Quads','Hips','Shoulders'] },
+  'Warrior II':        { img: null, muscles: ['Quads','Hips','Core'] },
+  'Tree Pose':         { img: null, muscles: ['Core','Hips','Calves'] },
+  'Cobra Pose':        { img: null, muscles: ['Spine','Chest','Abs'] },
+  'Bridge Pose':       { img: null, muscles: ['Glutes','Hamstrings','Spine'] },
+  'Seated Forward Fold':{ img: null, muscles: ['Hamstrings','Spine'] },
+  'Supine Twist':      { img: null, muscles: ['Spine','Obliques'] },
+  'Legs Up Wall':      { img: null, muscles: ['Hamstrings','Lower Back'] },
+  'Chair Pose':        { img: null, muscles: ['Quads','Core','Ankles'] },
+  'Camel Pose':        { img: null, muscles: ['Spine','Chest','Hip Flexors'] },
+};
+
 const exerciseImageCache = new Map();
 let activeDetailExercise = null;
 
 async function fetchExerciseData(name) {
   if (exerciseImageCache.has(name)) return exerciseImageCache.get(name);
-  try {
-    const res = await fetch(
-      `https://wger.de/api/v2/exercise/search/?term=${encodeURIComponent(name)}&language=english&format=json`,
-      { signal: AbortSignal.timeout(6000) }
-    );
-    const data = await res.json();
-    const match = (data.suggestions || []).find(s =>
-      s.value.toLowerCase().includes(name.toLowerCase().split(' ')[0])
-    ) || data.suggestions?.[0];
-    if (!match) { exerciseImageCache.set(name, null); return null; }
-
-    const exId = match.data.id;
-    const [imgRes, detailRes] = await Promise.all([
-      fetch(`https://wger.de/api/v2/exerciseimage/?format=json&exercise=${exId}&is_main=true`, { signal: AbortSignal.timeout(6000) }),
-      fetch(`https://wger.de/api/v2/exerciseinfo/${exId}/?format=json`, { signal: AbortSignal.timeout(6000) })
-    ]);
-    const imgData = await imgRes.json();
-    const detail = await detailRes.json();
-    const muscles = [
-      ...(detail.muscles || []).map(m => m.name_en),
-      ...(detail.muscles_secondary || []).map(m => m.name_en)
-    ].filter(Boolean).slice(0, 4);
-    const result = {
-      imageUrl: imgData.results?.[0]?.image || null,
-      muscles
-    };
+  const data = EXERCISE_IMG_DATA[name];
+  if (data) {
+    const result = { imageUrl: data.img, muscles: data.muscles };
     exerciseImageCache.set(name, result);
     return result;
-  } catch {
-    exerciseImageCache.set(name, null);
-    return null;
   }
+  exerciseImageCache.set(name, null);
+  return null;
 }
 
 function showExDetail(name, group) {
@@ -551,7 +675,7 @@ function showExDetail(name, group) {
     ? 'linear-gradient(135deg,#FF6584,#FF9F43)' : '';
 
   // Reset image area
-  document.getElementById('edSpinner').style.display = 'block';
+  document.getElementById('edSpinner').style.display = 'none';
   document.getElementById('edImage').style.display = 'none';
   document.getElementById('edImgPlaceholder').style.display = 'none';
 
@@ -563,14 +687,14 @@ function showExDetail(name, group) {
       const img = document.getElementById('edImage');
       img.src = result.imageUrl;
       img.style.display = 'block';
-      if (result.muscles?.length) {
-        document.getElementById('edMuscleList').textContent = result.muscles.join(', ');
-        document.getElementById('edMuscles').style.display = 'block';
-      }
     } else {
       const ph = document.getElementById('edImgPlaceholder');
       ph.textContent = icon;
       ph.style.display = 'block';
+    }
+    if (result?.muscles?.length) {
+      document.getElementById('edMuscleList').textContent = result.muscles.join(', ');
+      document.getElementById('edMuscles').style.display = 'block';
     }
   });
 }
