@@ -21,9 +21,6 @@ function initApp() {
   checkOllama();
   document.getElementById('logDateLabel').textContent = formatDate(currentLogDate);
   loadLogIntoForm(currentLogDate);
-  initParticles();
-  initTiltEffect();
-
   if (settings.sbUrl && settings.sbKey) {
     initSupabase(settings.sbUrl, settings.sbKey);
     syncFromSupabase();
@@ -925,10 +922,10 @@ function renderDashboard() {
   if (log) {
     document.getElementById('todayStatus').className = log.status === 'final' ? 'badge badge-green' : 'badge badge-orange';
     document.getElementById('todayStatus').textContent = log.status === 'final' ? 'Final ✓' : 'Draft';
-    animateValue(document.getElementById('dash-weight'), log.weight ? log.weight + '' : '—');
-    animateValue(document.getElementById('dash-protein'), log.totalProtein || '—');
-    animateValue(document.getElementById('dash-sleep'), log.sleepHours ? log.sleepHours.toFixed(1) : '—');
-    animateValue(document.getElementById('dash-water'), log.water ? log.water.toFixed(1) : '—');
+    document.getElementById('dash-weight').textContent = log.weight ? log.weight + '' : '—';
+    document.getElementById('dash-protein').textContent = log.totalProtein || '—';
+    document.getElementById('dash-sleep').textContent = log.sleepHours ? log.sleepHours.toFixed(1) : '—';
+    document.getElementById('dash-water').textContent = log.water ? log.water.toFixed(1) : '—';
     const steps = log.steps || 0;
     document.getElementById('dash-steps-label').textContent = steps.toLocaleString() + ' / ' + settings.stepsTarget.toLocaleString();
     document.getElementById('dash-steps-bar').style.width = Math.min(100, (steps / settings.stepsTarget) * 100) + '%';
@@ -1642,100 +1639,6 @@ async function checkOllama() {
     if (ollamaBtn) ollamaBtn.disabled = false; // still let them try
   }
   if (geminiBtn) geminiBtn.disabled = !settings.geminiKey;
-}
-
-// ===================== 3D ANIMATIONS =====================
-
-function initParticles() {
-  const canvas = document.getElementById('particleCanvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  let W, H, particles = [], animId;
-
-  function resize() {
-    W = canvas.width  = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-  }
-  resize();
-  window.addEventListener('resize', () => { resize(); });
-
-  const colors = ['108,99,255', '255,101,132', '0,214,143', '56,189,248'];
-  for (let i = 0; i < 55; i++) {
-    particles.push({
-      x: Math.random() * W, y: Math.random() * H,
-      r: Math.random() * 1.8 + 0.4,
-      dx: (Math.random() - 0.5) * 0.35,
-      dy: (Math.random() - 0.5) * 0.35,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      alpha: Math.random() * 0.45 + 0.1
-    });
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
-    // Connections
-    for (let i = 0; i < particles.length; i++) {
-      for (let j = i + 1; j < particles.length; j++) {
-        const a = particles[i], b = particles[j];
-        const d = Math.hypot(a.x - b.x, a.y - b.y);
-        if (d < 130) {
-          ctx.beginPath();
-          ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
-          ctx.strokeStyle = `rgba(108,99,255,${0.07 * (1 - d / 130)})`;
-          ctx.lineWidth = 0.6;
-          ctx.stroke();
-        }
-      }
-    }
-    // Dots
-    particles.forEach(p => {
-      p.x += p.dx; p.y += p.dy;
-      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
-      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${p.color},${p.alpha})`;
-      ctx.fill();
-    });
-    animId = requestAnimationFrame(draw);
-  }
-  draw();
-}
-
-function initTiltEffect() {
-  function applyTilt(el) {
-    el.addEventListener('mousemove', e => {
-      const r = el.getBoundingClientRect();
-      const x = (e.clientX - r.left) / r.width  - 0.5;
-      const y = (e.clientY - r.top)  / r.height - 0.5;
-      el.style.transform = `perspective(700px) rotateY(${x * 9}deg) rotateX(${-y * 9}deg) translateZ(10px) scale(1.01)`;
-      el.style.boxShadow = `${-x * 22}px ${y * 22}px 36px rgba(108,99,255,0.14)`;
-    });
-    el.addEventListener('mouseleave', () => {
-      el.style.transform = '';
-      el.style.boxShadow = '';
-    });
-  }
-
-  function attachTilt() {
-    document.querySelectorAll('.card:not(.tilt-bound), .stat-card:not(.tilt-bound)').forEach(el => {
-      el.classList.add('tilt-bound');
-      applyTilt(el);
-    });
-  }
-  attachTilt();
-  // Re-attach after dashboard re-renders
-  const observer = new MutationObserver(attachTilt);
-  observer.observe(document.body, { childList: true, subtree: true });
-}
-
-// Animate numeric dashboard values
-function animateValue(el, val) {
-  if (!el || val == null || val === '—') { if(el) el.textContent = val || '—'; return; }
-  el.classList.remove('anim-val');
-  void el.offsetWidth; // reflow
-  el.textContent = val;
-  el.classList.add('anim-val');
 }
 
 // Run on load (script is at end of body, DOM is ready)
