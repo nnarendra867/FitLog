@@ -1,7 +1,8 @@
-const CACHE = 'fitlog-v1';
+const CACHE = 'fitlog-v2';
 const ASSETS = [
   '/',
   '/index.html',
+  '/app.html',
   '/app.js',
   '/manifest.json'
 ];
