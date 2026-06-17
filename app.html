@@ -261,6 +261,12 @@
     <div id="tplMealTarget" class="text-sm mb-3 font-medium" style="color:#FFFFFF;"></div>
     <!-- Saved templates list -->
     <div id="tplList" class="space-y-2 mb-4 max-h-60 overflow-y-auto"></div>
+    <!-- Pick from Protein Guide -->
+    <div class="card2 p-4 rounded-xl space-y-3 mb-4">
+      <div class="text-xs font-semibold" style="color:var(--text-secondary);">PICK FROM PROTEIN GUIDE</div>
+      <input id="tplProteinSearch" type="text" placeholder="Search food..." class="input-field" style="font-size:14px;" oninput="filterTplProteinPicker(this.value)" />
+      <div id="tplProteinPicker" class="space-y-1 max-h-40 overflow-y-auto"></div>
+    </div>
     <!-- Add new template -->
     <div class="card2 p-4 rounded-xl space-y-3">
       <div class="text-xs font-semibold" style="color:var(--text-secondary);">SAVE CURRENT AS TEMPLATE</div>

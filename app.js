@@ -1447,8 +1447,34 @@ function openTplModal(meal) {
   document.getElementById('tplName').value = '';
   const currentProtein = parseFloat(document.getElementById('f-protein-' + meal)?.value) || 0;
   document.getElementById('tplProtein').value = currentProtein;
+  document.getElementById('tplProteinSearch').value = '';
   renderTplList();
+  renderTplProteinPicker('');
   document.getElementById('tplModal').style.display = 'flex';
+}
+function renderTplProteinPicker(query) {
+  const container = document.getElementById('tplProteinPicker');
+  if (!container) return;
+  const q = (query || '').toLowerCase();
+  const data = PROTEIN_DATA.filter(f => !q || f.food.toLowerCase().includes(q)).slice(0, 30);
+  if (data.length === 0) {
+    container.innerHTML = '<p class="text-xs text-center py-2" style="color:var(--text-secondary);">No matches</p>';
+    return;
+  }
+  container.innerHTML = data.map((f, i) => `
+    <div class="protein-row flex items-center justify-between px-2 py-2 cursor-pointer rounded" onclick="pickTplProtein('${f.food.replace(/'/g, "\\'")}', ${f.protein})">
+      <span class="text-sm">${f.food}</span>
+      <span class="text-sm font-bold" style="color:#FFFFFF;">${f.protein}g</span>
+    </div>
+  `).join('');
+}
+function filterTplProteinPicker(query) {
+  renderTplProteinPicker(query);
+}
+function pickTplProtein(food, protein) {
+  document.getElementById('tplName').value = food;
+  document.getElementById('tplProtein').value = protein;
+  showToast(food + ' selected ✓');
 }
 function closeTplModal() {
   document.getElementById('tplModal').style.display = 'none';
