@@ -54,7 +54,7 @@
     .section.active { display: block; }
     /* Multi-select exercise tags */
     .exercise-tag { display: inline-flex; align-items: center; gap: 5px; padding: 6px 10px; border-radius: 20px; font-size: 13px; cursor: pointer; transition: all 0.15s; color: var(--text-secondary); user-select: none; border: 1px solid transparent; }
-    .exercise-tag .ex-icon { font-size: 15px; line-height: 1; flex-shrink: 0; }
+    .exercise-tag .ex-icon { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
     .exercise-tag .ex-info { font-size: 11px; opacity: 0.6; cursor: pointer; padding: 0 2px; flex-shrink: 0; }
     .exercise-tag .ex-info:hover { opacity: 1; }
     .exercise-tag.selected { color: white !important; }
@@ -62,15 +62,12 @@
     /* Exercise detail modal image */
     .ex-img-area { background: var(--bg-card2); border-radius: 14px; min-height: 220px; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 14px; position: relative; }
     .ex-img-area img { width: 100%; height: 100%; object-fit: cover; border-radius: 14px; }
-    .ex-img-placeholder { font-size: 72px; text-align: center; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: #6C63FF; border-radius: 50%; animation: spin 0.8s linear infinite; }
     /* Exercise group header */
     .ex-group-header { display: flex; align-items: center; gap: 8px; width: 100%; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin: 14px 0 6px; padding: 6px 10px; border-radius: 8px; }
     /* Exercise tooltip */
     #exTooltip { position: fixed; bottom: 96px; left: 50%; transform: translateX(-50%); background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 16px; font-size: 13px; z-index: 200; max-width: 300px; width: calc(100% - 48px); text-align: center; box-shadow: 0 8px 28px rgba(0,0,0,0.45); pointer-events: none; opacity: 0; transition: opacity 0.18s; }
     #exTooltip.show { opacity: 1; }
-    #exTooltip .tt-icon { font-size: 28px; display: block; margin-bottom: 4px; }
+    #exTooltip .tt-icon { width: 48px; height: 48px; border-radius: 10px; object-fit: cover; display: block; margin: 0 auto 6px; }
     #exTooltip .tt-name { font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
     #exTooltip .tt-desc { color: var(--text-secondary); font-size: 12px; line-height: 1.5; }
     /* Stepper */
@@ -277,20 +274,15 @@
 <div id="exDetailModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeExDetail()">
   <div class="modal p-5" style="max-width:420px;">
     <div class="flex items-center justify-between mb-4">
-      <div class="flex items-center gap-3">
-        <span id="edIcon" style="font-size:30px;"></span>
-        <div>
-          <h3 id="edName" class="text-lg font-bold"></h3>
-          <div id="edGroup" class="text-xs font-semibold" style="color:var(--text-secondary);"></div>
-        </div>
+      <div>
+        <h3 id="edName" class="text-lg font-bold"></h3>
+        <div id="edGroup" class="text-xs font-semibold" style="color:var(--text-secondary);"></div>
       </div>
       <button onclick="closeExDetail()" style="color:var(--text-secondary);background:none;border:none;font-size:22px;cursor:pointer;line-height:1;">✕</button>
     </div>
-    <!-- Image / GIF area -->
+    <!-- Image area -->
     <div class="ex-img-area" id="edImageArea">
-      <div class="spinner" id="edSpinner"></div>
       <img id="edImage" style="display:none;" alt="" />
-      <div id="edImgPlaceholder" class="ex-img-placeholder" style="display:none;"></div>
     </div>
     <!-- Muscles targeted -->
     <div id="edMuscles" class="text-xs mb-3" style="color:var(--text-secondary);display:none;">
@@ -884,12 +876,12 @@
 
 <!-- Exercise tooltip -->
 <div id="exTooltip">
-  <span class="tt-icon" id="ttIcon"></span>
+  <img class="tt-icon" id="ttIcon" alt="" />
   <div class="tt-name" id="ttName"></div>
   <div class="tt-desc" id="ttDesc"></div>
 </div>
 
-<script src="app.js?v=4"></script>
+<script src="app.js?v=5"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').then(() => console.log('SW registered'));
