@@ -140,7 +140,7 @@ function saveReview(r) {
 function setSyncStatus(state) {
   // state: 'syncing' | 'ok' | 'error' | 'idle'
   const icons = { syncing:'🔄', ok:'☁️', error:'⚠️', idle:'☁️' };
-  const colors = { syncing:'#38BDF8', ok:'#00D68F', error:'#FF6584', idle:'var(--text-secondary)' };
+  const colors = { syncing:'#FFFFFF', ok:'#FFFFFF', error:'#FFFFFF', idle:'var(--text-secondary)' };
   const el = document.getElementById('syncBtn');
   if (!el) return;
   el.textContent = icons[state] || '☁️';
@@ -299,16 +299,16 @@ const EXERCISES = {
 };
 
 const GROUP_STYLES = {
-  'Arms':      { color: '#8B5CF6', bg: 'rgba(139,92,246,0.13)', border: 'rgba(139,92,246,0.32)', selBg: 'rgba(139,92,246,0.35)' },
-  'Chest':     { color: '#FF6584', bg: 'rgba(255,101,132,0.12)', border: 'rgba(255,101,132,0.32)', selBg: 'rgba(255,101,132,0.35)' },
-  'Back':      { color: '#00D68F', bg: 'rgba(0,214,143,0.12)', border: 'rgba(0,214,143,0.30)', selBg: 'rgba(0,214,143,0.32)' },
-  'Shoulders': { color: '#38BDF8', bg: 'rgba(56,189,248,0.12)', border: 'rgba(56,189,248,0.30)', selBg: 'rgba(56,189,248,0.32)' },
-  'Core':      { color: '#FF9F43', bg: 'rgba(255,159,67,0.12)', border: 'rgba(255,159,67,0.30)', selBg: 'rgba(255,159,67,0.32)' },
-  'Legs':      { color: '#A78BFA', bg: 'rgba(167,139,250,0.12)', border: 'rgba(167,139,250,0.30)', selBg: 'rgba(167,139,250,0.32)' },
-  'Cardio':    { color: '#F87171', bg: 'rgba(248,113,113,0.12)', border: 'rgba(248,113,113,0.30)', selBg: 'rgba(248,113,113,0.32)' },
-  'Full Body': { color: '#34D399', bg: 'rgba(52,211,153,0.12)', border: 'rgba(52,211,153,0.28)', selBg: 'rgba(52,211,153,0.32)' },
-  'Mobility':  { color: '#FB923C', bg: 'rgba(251,146,60,0.11)', border: 'rgba(251,146,60,0.28)', selBg: 'rgba(251,146,60,0.32)' },
-  'Yoga':      { color: '#E879F9', bg: 'rgba(232,121,249,0.11)', border: 'rgba(232,121,249,0.28)', selBg: 'rgba(232,121,249,0.32)' },
+  'Arms':      { color: '#FFFFFF', bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.18)', selBg: '#FFFFFF' },
+  'Chest':     { color: '#FFFFFF', bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.18)', selBg: '#FFFFFF' },
+  'Back':      { color: '#FFFFFF', bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.18)', selBg: '#FFFFFF' },
+  'Shoulders': { color: '#FFFFFF', bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.18)', selBg: '#FFFFFF' },
+  'Core':      { color: '#FFFFFF', bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.18)', selBg: '#FFFFFF' },
+  'Legs':      { color: '#FFFFFF', bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.18)', selBg: '#FFFFFF' },
+  'Cardio':    { color: '#FFFFFF', bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.18)', selBg: '#FFFFFF' },
+  'Full Body': { color: '#FFFFFF', bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.18)', selBg: '#FFFFFF' },
+  'Mobility':  { color: '#FFFFFF', bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.18)', selBg: '#FFFFFF' },
+  'Yoga':      { color: '#FFFFFF', bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.18)', selBg: '#FFFFFF' },
 };
 
 const EXERCISE_DESC = {
@@ -633,8 +633,8 @@ function showExDetail(name, group) {
   document.getElementById('edDesc').textContent = desc;
   document.getElementById('edMuscles').style.display = 'none';
   document.getElementById('edSelectBtn').textContent = isSelected ? '✓ Added — Remove' : '+ Add to Workout';
-  document.getElementById('edSelectBtn').style.background = isSelected
-    ? 'linear-gradient(135deg,#FF6584,#FF9F43)' : '';
+  document.getElementById('edSelectBtn').style.background = isSelected ? '#FFFFFF' : '';
+  document.getElementById('edSelectBtn').style.color = isSelected ? '#000000' : '';
 
   const img = document.getElementById('edImage');
   img.style.display = 'none';
@@ -671,15 +671,17 @@ function toggleExFromDetail() {
     }
     document.getElementById('edSelectBtn').textContent = '+ Add to Workout';
     document.getElementById('edSelectBtn').style.background = '';
+    document.getElementById('edSelectBtn').style.color = '';
   } else {
     selectedExercises.add(name);
     if (tag) {
       tag.classList.add('selected');
       const gs = GROUP_STYLES[tag.dataset.group] || GROUP_STYLES['Arms'];
-      tag.style.background = gs.selBg; tag.style.borderColor = gs.color; tag.style.color = 'white';
+      tag.style.background = gs.selBg; tag.style.borderColor = gs.color; tag.style.color = 'black';
     }
     document.getElementById('edSelectBtn').textContent = '✓ Added — Remove';
-    document.getElementById('edSelectBtn').style.background = 'linear-gradient(135deg,#FF6584,#FF9F43)';
+    document.getElementById('edSelectBtn').style.background = '#FFFFFF';
+    document.getElementById('edSelectBtn').style.color = '#000000';
   }
 }
 
@@ -734,7 +736,7 @@ function initExerciseTags() {
           tag.classList.add('selected');
           tag.style.background = gs.selBg;
           tag.style.borderColor = gs.color;
-          tag.style.color = 'white';
+          tag.style.color = 'black';
           showExTooltip(thumb, ex, desc);
         }
       };
@@ -849,7 +851,7 @@ function loadLogIntoForm(date) {
         const gs = GROUP_STYLES[t.dataset.group] || GROUP_STYLES['Arms'];
         t.style.background = gs.selBg;
         t.style.borderColor = gs.color;
-        t.style.color = 'white';
+        t.style.color = 'black';
       }
     });
   });
@@ -911,7 +913,7 @@ function renderDashboard() {
     const ds = dd.toISOString().split('T')[0];
     last7.push({ label: formatDateShort(ds), weight: (logs[ds] && logs[ds].weight) || null });
   }
-  renderLineChart('weightChart', last7.map(d => d.label), last7.map(d => d.weight), '#6C63FF', 'kg');
+  renderLineChart('weightChart', last7.map(d => d.label), last7.map(d => d.weight), '#FFFFFF', 'kg');
 
   // Recent logs
   const container = document.getElementById('recentLogs');
@@ -925,7 +927,7 @@ function renderDashboard() {
 function logCard(date, l) {
   const exercises = (l.exercises || []).slice(0, 3).join(', ');
   return `
-  <div class="card p-3 cursor-pointer hover:border-purple-500 transition-colors" onclick="openLog('${date}')">
+  <div class="card p-3 cursor-pointer hover:border-white transition-colors" onclick="openLog('${date}')">
     <div class="flex items-center justify-between mb-2">
       <span class="font-medium text-sm">${formatDateShort(date)}</span>
       <span class="badge ${l.status === 'final' ? 'badge-green' : 'badge-orange'}">${l.status === 'final' ? 'Final' : 'Draft'}</span>
@@ -965,9 +967,9 @@ function renderHistory() {
       sleep: l ? l.sleepHours : null
     });
   }
-  renderLineChart('weightChart30', last30.map(d => d.label), last30.map(d => d.weight), '#6C63FF', 'kg');
-  renderLineChart('proteinChart', last30.map(d => d.label), last30.map(d => d.protein), '#00D68F', 'g');
-  renderLineChart('sleepChart', last30.map(d => d.label), last30.map(d => d.sleep), '#FF9F43', 'hrs');
+  renderLineChart('weightChart30', last30.map(d => d.label), last30.map(d => d.weight), '#FFFFFF', 'kg');
+  renderLineChart('proteinChart', last30.map(d => d.label), last30.map(d => d.protein), '#FFFFFF', 'g');
+  renderLineChart('sleepChart', last30.map(d => d.label), last30.map(d => d.sleep), '#FFFFFF', 'hrs');
 
   const container = document.getElementById('historyList');
   container.innerHTML = '';
@@ -998,8 +1000,8 @@ function renderLineChart(canvasId, labels, data, color, unit) {
     options: {
       plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ctx.parsed.y !== null ? ctx.parsed.y + ' ' + unit : 'No data' } } },
       scales: {
-        x: { ticks: { color: '#64748B', font: { size: 10 }, maxRotation: 0, maxTicksLimit: 7 }, grid: { color: '#1E293B' } },
-        y: { ticks: { color: '#64748B', font: { size: 10 } }, grid: { color: '#1E293B' } }
+        x: { ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 10 }, maxRotation: 0, maxTicksLimit: 7 }, grid: { color: 'rgba(255,255,255,0.08)' } },
+        y: { ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.08)' } }
       },
       responsive: true,
       maintainAspectRatio: true
@@ -1107,8 +1109,8 @@ async function getAIReview(engine) {
   } catch (e) {
     const hint = useGemini
       ? `Gemini error: ${e.message}. Check API key in Settings.`
-      : `Could not connect to Ollama at ${settings.ollamaUrl}.\n\nRun: <code style="background:#1E293B;padding:2px 8px;border-radius:4px;">ollama serve</code>\n\nOr use Copy Prompt → paste into ChatGPT/Claude.`;
-    textDiv.innerHTML = `<span style="color:#FF6584;">${hint}</span>`;
+      : `Could not connect to Ollama at ${settings.ollamaUrl}.\n\nRun: <code style="background:#141414;padding:2px 8px;border-radius:2px;">ollama serve</code>\n\nOr use Copy Prompt → paste into ChatGPT/Claude.`;
+    textDiv.innerHTML = `<span style="color:#FFFFFF;">${hint}</span>`;
   }
 
   btn.disabled = false;
@@ -1199,7 +1201,7 @@ async function callGemini(system, user, textDiv) {
 
 function formatReviewHTML(text) {
   return text
-    .replace(/\*\*(.*?)\*\*/g, '<strong style="color:#6C63FF;">$1</strong>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong style="color:#FFFFFF;">$1</strong>')
     .replace(/\n/g, '<br>');
 }
 
@@ -1399,9 +1401,8 @@ function renderProteinTable() {
   const totalPages = Math.ceil(data.length / PROTEIN_PAGE_SIZE);
   const start = proteinPage * PROTEIN_PAGE_SIZE;
   const page = data.slice(start, start + PROTEIN_PAGE_SIZE);
-  const regionColors = { north:'#FF9F43', south:'#00D68F', global:'#38BDF8', supplement:'#8B5CF6' };
+  const rcDefault = 'rgba(255,255,255,0.6)';
   container.innerHTML = page.map(f => {
-    const rc = regionColors[f.region] || 'var(--text-secondary)';
     const rl = { north:'N', south:'S', global:'G', supplement:'💊' }[f.region] || '';
     return `
     <div class="protein-row flex items-center justify-between px-4 py-3 transition-colors">
@@ -1409,10 +1410,10 @@ function renderProteinTable() {
         <div class="text-sm font-medium">${f.food}</div>
         <div class="flex items-center gap-2 mt-0.5">
           <span class="text-xs" style="color:var(--text-secondary);">per ${f.unit}</span>
-          ${f.region !== 'all' ? `<span class="text-xs font-bold px-1.5 py-0.5 rounded" style="background:${rc}22;color:${rc};">${rl}</span>` : ''}
+          ${f.region !== 'all' ? `<span class="text-xs font-bold px-1.5 py-0.5 rounded" style="border:1px solid rgba(255,255,255,0.3);color:${rcDefault};">${rl}</span>` : ''}
         </div>
       </div>
-      <div class="text-lg font-bold flex-shrink-0" style="color:#00D68F;">${f.protein}g</div>
+      <div class="text-lg font-bold flex-shrink-0" style="color:#FFFFFF;">${f.protein}g</div>
     </div>`;
   }).join('');
   if (pagination) {
