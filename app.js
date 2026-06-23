@@ -55,11 +55,13 @@ function fmtDuration(d) {
 
 // ===================== SETTINGS =====================
 function loadSettings() {
-  const def = { proteinTarget: 130, stepsTarget: 8000, waterTarget: 3.5, ollamaUrl: 'http://localhost:11434', ollamaModel: 'gemma4:26b', sbUrl: '', sbKey: '', geminiKey: '' };
+  const def = { proteinTarget: 130, stepsTarget: 8000, waterTarget: 3.5, ollamaUrl: 'http://localhost:11434', ollamaModel: 'gemma4:26b', sbUrl: 'https://wzfbybrtsyzpqvdvmvzy.supabase.co', sbKey: '', geminiKey: '' };
   try {
     const saved = { ...def, ...JSON.parse(localStorage.getItem('fitlog_settings') || '{}') };
     // migrate old default model
     if (saved.ollamaModel === 'gemma3:4b') saved.ollamaModel = 'gemma4:26b';
+    // backfill default Supabase URL for existing users who never set one
+    if (!saved.sbUrl) saved.sbUrl = def.sbUrl;
     return saved;
   } catch { return def; }
 }
