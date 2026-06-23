@@ -55,13 +55,14 @@ function fmtDuration(d) {
 
 // ===================== SETTINGS =====================
 function loadSettings() {
-  const def = { proteinTarget: 130, stepsTarget: 8000, waterTarget: 3.5, ollamaUrl: 'http://localhost:11434', ollamaModel: 'gemma4:26b', sbUrl: 'https://wzfbybrtsyzpqvdvmvzy.supabase.co', sbKey: '', geminiKey: '' };
+  const def = { proteinTarget: 130, stepsTarget: 8000, waterTarget: 3.5, ollamaUrl: 'http://localhost:11434', ollamaModel: 'gemma4:26b', sbUrl: 'https://wzfbybrtsyzpqvdvmvzy.supabase.co', sbKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6ZmJ5YnJ0c3l6cHF2ZHZtdnp5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MTg1OTksImV4cCI6MjA5NzA5NDU5OX0.6VqJ7XQT1_4WLT1CHMrAXJymGkKc9NL-6aNsj4RoQDE', geminiKey: '' };
   try {
     const saved = { ...def, ...JSON.parse(localStorage.getItem('fitlog_settings') || '{}') };
     // migrate old default model
     if (saved.ollamaModel === 'gemma3:4b') saved.ollamaModel = 'gemma4:26b';
-    // backfill default Supabase URL for existing users who never set one
+    // backfill default Supabase URL/key for existing users who never set one
     if (!saved.sbUrl) saved.sbUrl = def.sbUrl;
+    if (!saved.sbKey) saved.sbKey = def.sbKey;
     return saved;
   } catch { return def; }
 }
